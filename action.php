@@ -23,7 +23,31 @@ $cr = new CarReservation(1);
 if($_POST){
 	//serialize(print_r("kk"));
 	if(isset($_POST['submit'])){
-		echo json_encode($cr->insert_data($_POST));
+		//validacija
+		require_once 'Validation.class.php';
+		$form = new Validation();
+		$datum_od = $_POST['datum_od'];
+		$datum_do = $_POST['datum_do'];
+		$firstname = $_POST['firstname'];
+		$lastname = $_POST['lastname'];
+		$tel = $_POST['tel'];
+		$email = $_POST['email'];
+		
+		$error['fname_error'] = $form->name_validation($firstname, 'First name');
+		$error['lname_error'] = $form->name_validation($lastname, 'Last name');
+		$error['email_error'] = $form->email_validation($email, 'E-mail');
+		$error['phone_error'] = $form->digits_validation($tel, 'phone number');
+		//kraj za validacija
+		if(is_array_empty($error)){
+			//vnesuvanje vo baza
+			echo json_encode($cr->insert_data($_POST)); 
+			//$cr->insert_data($_POST);
+			echo json_encode($error);
+		}
+		else{
+			//pecatenje na greska
+			echo json_encode($error);
+		}
 		
 		exit;	
 		//zapisuvanje vo bazata		
@@ -89,8 +113,7 @@ function car_choise($car_klasa, $datum_od, $datum_do, $cr){
 }
 
 /**
- * 
- * Function to sanitize values received from the form. Prevents SQL injection ...
+ * Funkcijata gi ciste  (sanitize) vrednostite dobieni od formata, Zastita od SQL injection
  * @param string $str
  */
 function clean($str, $cr) {
@@ -99,10 +122,22 @@ function clean($str, $cr) {
 	if(get_magic_quotes_gpc()) {
 		$str = stripslashes($str);
 	}
- return $str;
+ 	return $str;
 	//return mysql_real_escape_string($str);
 }
 
-
+/**
+ * 
+ * Proveruva dali elementite na edna niza se prazni
+ * @param array $a
+ */
+function is_array_empty($a){
+	foreach($a as $elm){
+		if(!empty($elm)){
+			return false;
+		}
+	}
+	return true;
+}
 
 ?>

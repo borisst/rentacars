@@ -6,6 +6,7 @@
  * 
  */
 require("CarReservation.class.php"); 
+
 ?>
 	<?php		 
 		/*require("include/config.inc.php"); 
@@ -72,7 +73,7 @@ require("CarReservation.class.php");
 	<body>
 	<?php 
 				$cr = new CarReservation();
-        $firma_detail = $cr->get_firma();
+				$firma_detail = $cr->get_firma();
 			//	print_r($cr->car_class());
 			//	print_r($cr->car_choise('MV','8/17/2013','8/27/2013'));
 			//	exit;
@@ -132,10 +133,14 @@ require("CarReservation.class.php");
 				<div id="Tret" class="ex">
 					Treta strana <br />
 					<div id="message_post"></div>
-					<label for="firstname">Ime:<span class="required">*</span></label><input id="firstname" type="text" name="firstname"><br>
-					<label for="lastname">Prezime:<span class="required">*</span></label><input id="lastname" type="text" name="lastname"><br>
-					<label for="tel">Tel:<span class="required">*</span></label><input id="tel" type="text" name="tel"><br>
-					<label for="email">Email:<span class="required">*</span></label><input id="email" type="text" name="email"><br>
+					<label for="firstname">Ime:<span class="required">*</span></label>
+						<input id="firstname" type="text" name="firstname"><div id="fname_error" class="error"></div><br>
+					<label for="lastname">Prezime:<span class="required">*</span></label>
+						<input id="lastname" type="text" name="lastname"><div id="lname_error" class="error"></div><br>
+					<label for="tel">Tel:<span class="required">*</span></label>
+						<input id="tel" type="text" name="tel"><div id="phone_error" class="error"></div><br>
+					<label for="email">Email:<span class="required">*</span></label>
+						<input id="email" type="text" name="email"><div id="email_error" class="error"></div><br>
 					<p class="submit"><button type="button" onclick="showSecond()">Back!</button>	
 					<input type="hidden" name="submit"/>	
 					<input type="submit" id="submitButton" value="Rezerviraj"></input></p>
@@ -168,6 +173,7 @@ require("CarReservation.class.php");
 	            //Validate your form here, example:
 	            var validated = true;
 	            if(($('#datepicker').val().length === 0) || ($('#datepicker1').val().length === 0)){
+		            
 		            validated = false;
 		            
 	            }
@@ -176,10 +182,16 @@ require("CarReservation.class.php");
 	            	var d1 = new Date($('#datepicker').val());
 		            var d2 = new Date($('#datepicker1').val());
 		            var diff =  Math.floor((d2.getTime() - d1.getTime()) / 86400000);
-		            $("input#vkupno-denovi-input").val(diff);
-		            $("#vkupno-denovi").text(diff);
 		            
-		            $("button#button-show-second").removeAttr("disabled"); 
+		            if(diff > 0){		
+		            	$("input#vkupno-denovi-input").val(diff);
+			            $("#vkupno-denovi").text(diff).removeAttr( 'style' );            
+		           	 	$("button#button-show-second").removeAttr("disabled"); 
+		            }
+		            else{
+		            	$("#vkupno-denovi").text('<?php echo "Datum od ne moze da bide pogolem od Datum do"?>').css('color','red');
+		            	$("button#button-show-second").prop('disabled', true);
+			        }
 	            }
 	            else{
 	            	$("button#button-show-second").prop('disabled', true);
@@ -196,9 +208,15 @@ require("CarReservation.class.php");
 	            	 var d1 = new Date($('#datepicker').val());
 			         var d2 = new Date($('#datepicker1').val());
 			         var diff = Math.floor((d2.getTime() - d1.getTime()) / 86400000);
-			         $("input#vkupno-denovi-input").val(diff);
-			         $("#vkupno-denovi").text(diff);
-		            $("button#button-show-second").removeAttr("disabled");   
+			         if(diff > 0){		
+			            	$("input#vkupno-denovi-input").val(diff);
+				            $("#vkupno-denovi").text(diff).removeAttr( 'style' );            
+			           	 	$("button#button-show-second").removeAttr("disabled"); 
+			            }
+			            else{
+			            	$("#vkupno-denovi").text('<?php echo "Datum od ne moze da bide pogolem od Datum do"?>').css('color','red');
+			            	$("button#button-show-second").prop('disabled', true);
+				       }  
 	            }
 	            else{
 	            	$("button#button-show-second").prop('disabled', true); 
@@ -233,13 +251,54 @@ require("CarReservation.class.php");
 	            }                             
 	      });
 			    $("form#form1").submit(function(e){     
-			       	e.preventDefault();          
-			        $.post("action.php", $("form#form1").serialize(),function(data){
-			          console.log(data);
-			        	$("#container").load('report.php');
-			        }, "json");     
-			    });		
+			       	e.preventDefault();    
+			             
+			        $.post("action.php", 
+					        $("form#form1").serialize(),
+					        function(data){
+				        		if(data !== null){
+					        		$('#fname_error').empty();
+					        		$('#lname_error').empty();
+					        		$('#phone_error').empty();
+					        		$('#email_error').empty();
+							        if(data.fname_error !== null){
+								        var validate = 'false';
+							          	$('#fname_error').html(data.fname_error);	
+							          	console.log('1'+validate);		          	
+							        }
+							        else if(data.lname_error !== null){
+							        	var validate = 'false';
+							        	$('#lname_error').html(data.lname_error); 
+							        	console.log('3'+validate);
+							       
+							        }
+							        else if(data.phone_error !== null){
+							        	var validate = 'false';
+							        	$('#phone_error').html(data.phone_error);
+							        	console.log('5'+validate);	
+							        	
+							        }
+							        else if(data.email_error !== null){
+							        	var validate = 'false';
+							        	$('#email_error').html(data.email_error); 
+							        	console.log('7'+validate);	
+							        	
+							        }
+							        else{
+							        	var validate = 'true';
+							        	console.log('8'+validate);	
+							        }
+				        		}
+						        console.log(validate);
+						        if(validate == 'true'){
+					          		console.log(data);
+					        		$("#content").load('report.php');
+						        }						        
+			        		}, 
+			        	"json");     
+			    });	
+			    	
 		});
 </script>
-	</body>
+</body>
 </html>
