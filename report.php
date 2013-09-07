@@ -1,7 +1,7 @@
 <?php session_start();?>
 
 <div>
-<h2>IME NA FIRMATA</h2>
+	<h2><?php echo $firma_detail['NAZIV']?></h2>
 	<dl>
 		<dt><b>Dogovor broj</b></dt>
 		<dd><?php echo $_SESSION['form1']['dok_id'];?></dd>

@@ -11,14 +11,26 @@ class CarReservation {
 	public function __construct($firmaid = null){
 		require_once("include/config.inc.php"); 
 		require_once("include/Database.class.php");
-		$this->firmaid = $firmaid;
+		//$this->firmaid = $firmaid;
 		
 	}
 	
 	public function db_select(){
 		$this->db = new Database(DB_SERVER, DB_USER, DB_PASS, DB_DATABASE, DB_PORT);
+    if(isset($_SESSION['firmaid'])){
+  			$this->firmaid = $_SESSION['firmaid'];
+  		}
 	}
 	
+ 	public function get_firma(){
+		$host = $_SERVER['HTTP_HOST'];
+		$this->db_select(); 
+		$this->db->connect(); 		 
+		$sql = "SELECT * FROM firma WHERE http='$host'";
+		$rows = $this->db->query_first($sql); 
+		$_SESSION['firmaid'] = $rows['FIRMAID'];
+		return $rows;	
+	}
 	
 	/**
 	 * 
@@ -80,7 +92,7 @@ class CarReservation {
 		try {
 		    $this->db->query_insert(TABLE_RENT_REZERVACII, $data);
 		    unset($data['CAR_KLASA']);
-		    $this->db->query_insert(TABLE_RENT_DOGOVOR, $data);
+		    //$this->db->query_insert(TABLE_RENT_DOGOVOR, $data);
 		} catch (Exception $e) {
 		    return  $e->getMessage();
 		}
