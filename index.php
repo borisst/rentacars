@@ -256,39 +256,44 @@ require("CarReservation.class.php");
 			        $.post("action.php", 
 					        $("form#form1").serialize(),
 					        function(data){
-				        		if(data !== null){
+				        		
 					        		$('#fname_error').empty();
 					        		$('#lname_error').empty();
 					        		$('#phone_error').empty();
 					        		$('#email_error').empty();
-							        if(data.fname_error !== null){
-								        var validate = 'false';
-							          	$('#fname_error').html(data.fname_error);	
-							          	console.log('1'+validate);		          	
-							        }
-							        else if(data.lname_error !== null){
-							        	var validate = 'false';
-							        	$('#lname_error').html(data.lname_error); 
-							        	console.log('3'+validate);
-							       
-							        }
-							        else if(data.phone_error !== null){
-							        	var validate = 'false';
-							        	$('#phone_error').html(data.phone_error);
-							        	console.log('5'+validate);	
-							        	
-							        }
-							        else if(data.email_error !== null){
-							        	var validate = 'false';
-							        	$('#email_error').html(data.email_error); 
-							        	console.log('7'+validate);	
-							        	
-							        }
+					        		console.log(data);
+					        		if(data !== null){
+								        if((data.fname_error !== null)){
+									        if(data.fname_error !== null){
+									            var validate = 'false';
+									          	$('#fname_error').html(data.fname_error);	
+									          	console.log('1'+validate);		 
+								        	}         	
+								        }
+								        else if(data.lname_error !== null){
+								        	var validate = 'false';
+								        	$('#lname_error').html(data.lname_error); 
+								        	console.log('3'+validate);
+								       
+								        }
+								        else if(data.phone_error !== null){
+								        	var validate = 'false';
+								        	$('#phone_error').html(data.phone_error);
+								        	console.log('5'+validate);	
+								        	
+								        }
+								        else if(data.email_error !== null){
+								        	var validate = 'false';
+								        	$('#email_error').html(data.email_error); 
+								        	console.log('7'+validate);	
+								        	
+								        }
+					        		}
 							        else{
 							        	var validate = 'true';
 							        	console.log('8'+validate);	
 							        }
-				        		}
+				        		
 						        console.log(validate);
 						        if(validate == 'true'){
 					          		console.log(data);
@@ -300,5 +305,5 @@ require("CarReservation.class.php");
 			    	
 		});
 </script>
-</body>
+	</body>
 </html>

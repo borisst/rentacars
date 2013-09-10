@@ -40,9 +40,9 @@ if($_POST){
 		//kraj za validacija
 		if(is_array_empty($error)){
 			//vnesuvanje vo baza
-			echo json_encode($cr->insert_data($_POST)); 
-			//$cr->insert_data($_POST);
-			echo json_encode($error);
+			//echo json_encode($cr->insert_data($_POST)); 
+			$cr->insert_data($_POST);
+			echo json_encode($error['false']=null);
 		}
 		else{
 			//pecatenje na greska

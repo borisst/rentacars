@@ -16,21 +16,29 @@ class CarReservation {
 	}
 	
 	public function db_select(){
-		$this->db = new Database(DB_SERVER, DB_USER, DB_PASS, DB_DATABASE, DB_PORT);
-    if(isset($_SESSION['firmaid'])){
+		$this->db = new Database(DB_SERVER, DB_USER, DB_PASS, DB_DATABASE);
+    	if(isset($_SESSION['firmaid'])){
   			$this->firmaid = $_SESSION['firmaid'];
   		}
 	}
 	
- 	public function get_firma(){
-		$host = $_SERVER['HTTP_HOST'];
-		$this->db_select(); 
-		$this->db->connect(); 		 
-		$sql = "SELECT * FROM firma WHERE http='$host'";
-		$rows = $this->db->query_first($sql); 
-		$_SESSION['firmaid'] = $rows['FIRMAID'];
-		return $rows;	
+ 	public function get_firma($username = null, $password = null){
+ 		$this->db_select(); 
+		$this->db->connect();
+ 		if(empty($username) || empty($password)){
+			$host = $_SERVER['HTTP_HOST'];			 		 
+			$sql = "SELECT * FROM firma WHERE http='$host'";
+			$rows = $this->db->query_first($sql); 
+			//$_SESSION['firmaid'] = $rows['FIRMAID'];
+			return $rows;	
+ 		}
+ 		else{
+ 			$sql="SELECT FIRMAID, USERNAME, PASSWORD FROM firma WHERE USERNAME='$username' AND PASSWORD='".$password."'";
+			$result = $this->db->fetch_all_array($sql); 
+			return $result;
+ 		}
 	}
+	
 	
 	/**
 	 * 
@@ -97,7 +105,10 @@ class CarReservation {
 		    return  $e->getMessage();
 		}
 		try{
-			mail($email, 'Ime na firma -rent a car',$data['KONTAKT_LICE'], "From:no-replay@email.com");
+      # First, instantiate the SDK with your API credentials and define your domain. 
+      $firma_detail =  $this->get_firma();
+			$this->send_mail($email,$firma_detail);
+			//mail($email, 'Ime na firma -rent a car',$data['KONTAKT_LICE'], "From:no-replay@email.com");
 		}catch (Exception $e){
 			return $e->getMessage();
 		}
@@ -203,12 +214,75 @@ class CarReservation {
 			$str = @trim($str);
 			if(get_magic_quotes_gpc()) {
 				$str = stripslashes($str);
-			} 
+			}
+ 
    return $str; 
 			//return mysql_real_escape_string($str);
 		}
 	
 	
+public function send_mail($to, $firma_detail){
+     $mg_api = 'key-7l3inwcadklnc1uyagv7qkchwq-bscg9';
+      $mg_version = 'api.mailgun.net/v2/';
+      $mg_domain = "rentacarsborces.mailgun.org";
+      $mg_from_email = "borces@gmail.com";
+      $mg_reply_to_email = "borces@gmail.com";
+      
+      $mg_message_url = "https://".$mg_version.$mg_domain."/messages";
+      
+ /*     
+$headers = array(
+               "Content-Type: application/x-www-form-urlencoded; charset: windows-1251"
+            );
+   */   
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+ //     
+	  curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+      curl_setopt ($ch, CURLOPT_MAXREDIRS, 3);
+      curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, false);
+      curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+      curl_setopt ($ch, CURLOPT_VERBOSE, 0);
+      curl_setopt ($ch, CURLOPT_HEADER, 1);
+      curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 10);
+      curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+      curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0);
+      
+      curl_setopt($ch, CURLOPT_USERPWD, 'api:' . $mg_api);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+      
+      curl_setopt($ch, CURLOPT_POST, true); 
+      //curl_setopt($curl, CURLOPT_POSTFIELDS, $params); 
+      curl_setopt($ch, CURLOPT_HEADER, false); 
+      
+      //curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+      curl_setopt($ch, CURLOPT_URL, $mg_message_url);
+      
+      curl_setopt($ch, CURLOPT_POSTFIELDS,                
+              array(  'from'      => 'aaaa <' . $mg_from_email . '>',
+                      'to'        => $to,
+                      'h:Reply-To'=>  ' <' . $mg_reply_to_email . '>',
+                      'subject'   => 'Rezervacija na avtomobil '.$firma_detail['NAZIV'],
+                      'html'      => '<h1>Rezervacija na avtomobil'.$firma_detail['NAZIV'].'</h1>',
+                 //     'attachment'[1] => 'aaa.rar'
+                  ));
+      $result = curl_exec($ch);
+      curl_close($ch);
+   
+   }
+   
+   public function sec_session_start() {
+        $session_name = 'sec_session_id'; // Set a custom session name
+        $secure = false; // Set to true if using https.
+        $httponly = true; // This stops javascript being able to access the session id. 
+ 
+        ini_set('session.use_only_cookies', 1); // Forces sessions to only use cookies. 
+        $cookieParams = session_get_cookie_params(); // Gets current cookies params.
+        session_set_cookie_params($cookieParams["lifetime"], $cookieParams["path"], $cookieParams["domain"], $secure, $httponly); 
+        session_name($session_name); // Sets the session name to the one set above.
+        session_start(); // Start the php session
+        session_regenerate_id(); // regenerated the session, delete the old one.  
+	}
 
 }
 ?>
