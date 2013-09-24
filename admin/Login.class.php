@@ -71,24 +71,7 @@ class Login extends CarReservation{
 		}		
 	}
 	
-	public function login_check(){
-		if(isset($_SESSION['SESS_FIRMAID']) && ($_SESSION['SESS_LOGIN_STRING'])) {
-		     $firmaid = $_SESSION['SESS_FIRMAID'];
-		     $login_string = $_SESSION['SESS_LOGIN_STRING'];
-		     $user_browser = $_SERVER['HTTP_USER_AGENT']; // Get the user-agent string of the user.		     
-			 $login_check = hash('sha512', $firmaid.$user_browser);
-			 if($login_check == $login_string) {
-	              // Logged In!!!!
-	              return true;
-	           } else {
-	              // Not logged in
-	              return false;
-	           }
-		}
-		else{
-			return false;
-		}
-	}
+
 	
 	public function logout(){
 		$_SESSION = array();

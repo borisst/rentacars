@@ -29,7 +29,7 @@ class CarReservation {
 			$host = $_SERVER['HTTP_HOST'];			 		 
 			$sql = "SELECT * FROM firma WHERE http='$host'";
 			$rows = $this->db->query_first($sql); 
-			//$_SESSION['firmaid'] = $rows['FIRMAID'];
+			$_SESSION['firmaid'] = $rows['FIRMAID'];
 			return $rows;	
  		}
  		else{
@@ -238,7 +238,7 @@ $headers = array(
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
  //     
-	  curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+//	  curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
       curl_setopt ($ch, CURLOPT_MAXREDIRS, 3);
       curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, false);
       curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -282,6 +282,59 @@ $headers = array(
         session_name($session_name); // Sets the session name to the one set above.
         session_start(); // Start the php session
         session_regenerate_id(); // regenerated the session, delete the old one.  
+	}
+	
+	public function get_firma_detail($firmaid=null){
+		if(!empty($firmaid)){
+			//echo $id;
+			$this->db_select(); 
+			$this->db->connect();
+			$sql="SELECT * FROM firma WHERE FIRMAID = '$firmaid'";
+			$result = $this->db->query_first($sql); 
+			return $result;
+		}
+	}
+	
+	public function login_check(){
+		//print_r($_SESSION);		
+		if(isset($_SESSION['SESS_FIRMAID']) && ($_SESSION['SESS_LOGIN_STRING'])) {
+		     $firmaid = $_SESSION['SESS_FIRMAID'];
+		     $login_string = $_SESSION['SESS_LOGIN_STRING'];
+		     $user_browser = $_SERVER['HTTP_USER_AGENT']; // Get the user-agent string of the user.		     
+			 $login_check = hash('sha512', $firmaid.$user_browser);
+			 if($login_check == $login_string) {
+	              // Logged In!!!!
+	              return true;
+	           } else {
+	              // Not logged in
+	              return false;
+	           }
+		}
+		else{
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 * spisok so napraveni dogovori
+	 * @param int $firmaid
+	 */
+	
+	public function contracts_list($firmaid = null){
+		if(!empty($firmaid)){
+			//proverka dali e logiran korisnikot
+			if($this->login_check()){
+				$this->db_select(); 
+				$this->db->connect();
+				$sql="SELECT * FROM rent_dogovor WHERE FIRMAID = '$firmaid'";
+				$result = $this->db->fetch_all_array($sql); 
+				return $result;
+			}
+			else{
+				die('carclas-ERROR-Acces Denied');
+			}
+		}
 	}
 
 }

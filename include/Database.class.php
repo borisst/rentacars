@@ -72,7 +72,7 @@ function Database($server, $user, $pass, $database, $port='',$pre=''){
 # Param: $new_link can force connect() to open a new link, even if mysql_connect() was called before with the same parameters
 function connect($new_link=false) {
 	$this->link_id=@mysql_connect($this->server,$this->user,$this->pass,$new_link);
-
+  mysql_set_charset('utf8',$this->link_id); 
 	if (!$this->link_id) {//open failed
 		$this->oops("Could not connect to server: <b>$this->server</b>.");
 		}

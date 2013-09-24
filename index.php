@@ -27,7 +27,7 @@ require("CarReservation.class.php");
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title></title>
 		<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 		<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
@@ -89,7 +89,7 @@ require("CarReservation.class.php");
 				<fieldset><legend>Rent a car</legend>
 				<div id="Prv" class="ex">
 						<p class="first">
-							<label for="datepicker">Datum od</label>
+							<label for="datepicker">Датум од</label>
 							<input type="text"  name="datum_od" id="datepicker" readonly="readonly"/>
 						</p>
 						<p>

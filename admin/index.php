@@ -1,8 +1,11 @@
 <?php 
-//require_once('auth.php');
-require_once ("../CarReservation.class.php");
-$cr = new CarReservation();
-$cr->sec_session_start();
+require_once("Login.class.php"); 
+//sessijata avtopatski se startuva vo contruktorot na klasot	
+$cr = new Login(); //klason Login go nasleduva klasot CarReservation
+if($cr->login_check()){
+	header("location: firma-index.php");
+	exit();
+}
 $firma_detail = $cr->get_firma();
 ?>
 <!DOCTYPE HTML>
@@ -30,7 +33,7 @@ $firma_detail = $cr->get_firma();
 		<div id="container">
 			<form action="mainpage.php" method="post">
 
-				<div class="login"><?php echo mb_convert_encoding($firma_detail['NAZIV'],'UTF-8','windows-1251');?></div>
+				<div class="login"><?php echo $firma_detail['NAZIV'];?></div>
 				<div class="username-text">Корисничко име:</div>
 				<div class="password-text">Лозинка:</div>
 				<div class="username-field">
