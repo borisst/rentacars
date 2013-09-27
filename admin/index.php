@@ -16,7 +16,7 @@ $firma_detail = $cr->get_firma();
 	<title>Име на фирма</title>
 
 	<!--- CSS --->
-	<link rel="stylesheet" href="css/style.css" type="text/css" />
+	<link rel="stylesheet" href="css/style_login.css" type="text/css" />
 
 
 	<!--- Javascript libraries (jQuery and Selectivizr) used for the custom checkbox --->

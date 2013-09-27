@@ -21,8 +21,13 @@
 
 	<!--- CSS --->
 	<link rel="stylesheet" href="css/style.css" type="text/css" />
+	<link rel="stylesheet" href="css/formee-style.css" type="text/css" />
+	<link rel="stylesheet" href="css/formee-structure.css" type="text/css" />
+	
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+
 	<!--- Javascript libraries (jQuery and Selectivizr) used for the custom checkbox --->
 
 	<!--[if (gte IE 6)&(lte IE 8)]>
@@ -41,18 +46,22 @@
 			   <li class='active'><a href='firma-index.php'><span>Почеток</span></a></li>
 			   <li><a href='#' id="new_contract"><span>Нов договор</span></a></li>
 			   <li><a href='#' id="contract_list" ><span>Преглед на договори</span></a></li>
+			   <li><a href='#' id="rezervation_pending_list" ><span>Преглед на резервации</span></a></li>
 			   <li class='last'><a href='#' id="cars"><span>Aвтомобили</span></a></li>
 			</ul>
 		</div>
 		<div id="content">
 			<div id="loader"></div>
+			
+			
+	
 		</div>
 		</div>
 		<div id="footer">
 		<?php  //print_r($firma_detail);
 		echo $firma_detail['NAZIV'];?>
 		</div>
-<script>
+<script type="text/javascript">
 	$(document).ready( function() {
 
 		    $.ajaxSetup ({  
@@ -61,10 +70,29 @@
 		    var ajax_load = '<img src="../img/ajax-loader.gif" />';  
 		      
 		//  load() functions  
-		    var loadUrl = "action-admin.php?action=contracts_list";  
+		    var loadUrl = "action-admin.php?action=contracts_list"; 
+		    var loadUrlRezList = "action-admin.php?action=rezervation_pending_list";  
+		     
 		    $("#contract_list").click(function(){  
 		        $("#content").html(ajax_load).load(loadUrl);  
 		    });  
+		    $("#rezervation_pending_list").click(function(){  
+		        $("#content").html(ajax_load).load(loadUrlRezList);  
+		    }); 
+		    $(document).on("click", "#get_rezervation_detail",function(event){			   
+		    	event.preventDefault();
+	    	    var url = ($(this).attr('href'));
+	    	    var dok_id = getURLParameter(url, 'dok_id');
+	    	    alert(dok_id);
+		    	var loadUrlGetRezDet= "action-admin.php?action=get_rezervation_detail&dok_id="+dok_id; 
+		    	$("#content").html(ajax_load).load(loadUrlGetRezDet);
+		    	return false;
+		    });
+		    
+		    function getURLParameter(url, name) {
+		        return (RegExp(name + '=' + '(.+?)(&|$)').exec(url)||[,null])[1];
+		    }
+ 	
 		});
 </script>		
 	</body>

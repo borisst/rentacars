@@ -45,8 +45,11 @@ class CarReservation {
 	 * zapisuvanje na rezervacija vo bazata
 	 */
 	public function insert_data($data_post){
-	  $datum_od = $this->clean($data_post['datum_od']);
+	    $datum_od = $this->clean($data_post['datum_od']);
 		$datum_do = $this->clean($data_post['datum_do']);
+		$datum_od = date('Y-m-d H:i:s', strtotime($datum_od)); //format na data 2013-09-26 22:00:00
+		$datum_do = date('Y-m-d H:i:s', strtotime($datum_do));
+		
 		$car_klasa = $this->clean($data_post['car-class']);
 		$car_id = $this->clean($data_post['car-choice']);
 		$firstname = $this->clean($data_post['firstname']);
@@ -54,7 +57,14 @@ class CarReservation {
 		$tel = $this->clean($data_post['tel']);
 		$email = $this->clean($data_post['email']);
 		$cena = $this->clean($data_post['cena']);
+		
 
+		$datetime1 = new DateTime($datum_od);
+		$datetime2 = new DateTime($datum_do);
+		$interval = $datetime1->diff($datetime2);
+		$denovi = $interval->days;
+		
+		
 		$_SESSION['form1']['datum_od'] = $datum_od; // store session data
 		$_SESSION['form1']['datum_do'] = $datum_do; // store session data
 		$_SESSION['form1']['car-class'] = $car_klasa; // store session data
@@ -64,6 +74,8 @@ class CarReservation {
 		$_SESSION['form1']['tel'] = $tel; // store session data
 		$_SESSION['form1']['email'] = $email; // store session data
 		$_SESSION['form1']['cena'] = $cena; // store session data
+		$_SESSION['form1']['denovi'] = $denovi; // store session data
+		
 		
 		$this->db_select(); 
 		$this->db->connect(); 
@@ -96,6 +108,10 @@ class CarReservation {
 		$data['CAR_ID'] = $car_id;
 		$data['DATUM'] = date('Y-m-d H:i:s');
 		$data['CENA'] = $cena;
+		$data['DENOVI'] = $denovi;
+		$firma = $this->get_firma();
+		$data['FIRMAID'] = $firma['FIRMAID'];
+		$data['KONTAKT_EMAIL'] = $email;
 		$data['STATUS'] = 'R';//prvicen status na rezervacijata, koga e potvrdena se dobiva status P
 		try {
 		    $this->db->query_insert(TABLE_RENT_REZERVACII, $data);
@@ -133,11 +149,12 @@ class CarReservation {
 		
 	}
 	
-	/*
-	 * kalkulacija na cena
+	/**
 	 * 
+	 * kalkulacija na cena
+	 * akoe $value e prazno vrakja html, vo sprotivno ja vrakja samo cenata
 	 */
-	public function get_rate($car_id=null, $zona=null, $denovi=null){
+	public function get_rate($car_id=null, $zona=null, $denovi=null, $value=false){
 		$this->db_select(); 
 		$this->db->connect(); 		 
 		$sql = "SELECT vrati_cena('$car_id', '$zona', '$denovi')";
@@ -148,7 +165,12 @@ class CarReservation {
 				$cena = $record["vrati_cena('$car_id', '$zona', '$denovi')"];
 				$price .= 'Cenata e:'.$cena.'<input type="hidden" name="cena" value="'.$cena.'"/> denari';
 			}
-		return json_encode($price);
+		if(!$value){
+			return json_encode($price);
+		}
+		else{
+			return $cena;
+		}
 	}
 /*	
 	public function get_days($datum_od, $datum_do){
@@ -336,6 +358,46 @@ $headers = array(
 			}
 		}
 	}
+	
+	/**
+	 * Spisok na rezervacii koi se napraveni od
+	 * korisnici no se uste ne se odobreni
+	 * Enter description here ...
+	 */
+	public function rezervation_pending($firmaid=null){
+		if(!empty($firmaid)){
+			//proverka dali e logiran korisnikot
+			if($this->login_check()){
+				$this->db_select(); 
+				$this->db->connect();
+				$sql="SELECT * FROM rent_rezervacii WHERE FIRMAID = '$firmaid'";
+				$result = $this->db->fetch_all_array($sql); 
+				return $result;
+			}
+			else{
+				die('carclas-ERROR-101 Acces Denied');
+			}
+		}
+	}
+	
+	/**
+	 * Detali za rezervacija za da premine vo dogovor
+	 */
+	public function get_rezervation_detail($firmaid= null, $dok_id=null){
+		if(!empty($dok_id)){
+			//proverka dali e logiran korisnikot
+			if($this->login_check()){
+				$this->db_select(); 
+				$this->db->connect();
+				$sql="SELECT * FROM rent_rezervacii INNER JOIN cars on cars.CAR_ID=rent_rezervacii.CAR_ID WHERE rent_rezervacii.FIRMAID = '$firmaid' AND DOK_ID = '$dok_id'";
+				$result = $this->db->query_first($sql); 
+				return $result;
+			}
+			else{
+				die('carclas-ERROR-102 Acces Denied');
+			}
+		}
+	}	
 
 }
 ?>
