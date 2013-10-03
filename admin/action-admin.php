@@ -21,8 +21,34 @@
 		}
 	}
 	if(isset($_POST)){
-		print_r($_POST);
-		exit;
+		//proverka za koja forma se raboti
+		if(isset($_POST['dogovor'])){
+			//se vcituva klasot validacija
+			require_once '../Validation.class.php';
+			$form = new Validation();
+			//validacija na polinjata od formata
+			//ako ima greska se zapisuva vo nizata $error
+		
+			$error['klice_error'] = $form->name_validation($_POST['KONTAKT_LICE']);
+			$error['embg_mesto_error'] = $form->name_validation($_POST['EMBG_MESTO'],'населено место');
+			$error['kontakt_email_error'] = $form->email_validation($_POST['KONTAKT_EMAIL'],'емаил');
+			$error['embg_error'] = $form->digits_validation($_POST['EMBG'],'матичен број');
+			$error['embg_data_error'] = $form->date_validation($_POST['EMBG_DATA'],'дата на раѓање');
+			$error['vozacka_broj_error'] = $form->digits_validation($_POST['VOZACKA_BROJ'],'број на возачка');
+			$error['kontakt_tel_error'] = $form->digits_validation($_POST['KONTAKT_TEL'],'телефонски број');
+			if(!empty($error)){
+				echo json_encode($error);
+			}
+			else{
+				//zapisuvanje na podatocite od formata za dogovor vo bazata
+		
+				print_r($_POST);
+				exit;
+			}
+
+		}
+		
+
 	}
 	
 

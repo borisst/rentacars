@@ -40,7 +40,6 @@ var $user     = ""; //database login name
 var $pass     = ""; //database login password
 var $database = ""; //database name
 var $pre      = ""; //table prefix
-var $port = "";
 
 
 #######################
@@ -57,12 +56,11 @@ var $query_id = 0;
 
 #-#############################################
 # desc: constructor
-function Database($server, $user, $pass, $database, $port='',$pre=''){
+function Database($server, $user, $pass, $database, $pre=''){
 	$this->server=$server;
 	$this->user=$user;
 	$this->pass=$pass;
 	$this->database=$database;
-  $this->port=$port;
 	$this->pre=$pre;
 }#-#constructor()
 
@@ -72,7 +70,7 @@ function Database($server, $user, $pass, $database, $port='',$pre=''){
 # Param: $new_link can force connect() to open a new link, even if mysql_connect() was called before with the same parameters
 function connect($new_link=false) {
 	$this->link_id=@mysql_connect($this->server,$this->user,$this->pass,$new_link);
-  mysql_set_charset('utf8',$this->link_id); 
+	mysql_set_charset('utf8',$this->link_id); 
 	if (!$this->link_id) {//open failed
 		$this->oops("Could not connect to server: <b>$this->server</b>.");
 		}

@@ -24,9 +24,11 @@
 	<link rel="stylesheet" href="css/formee-style.css" type="text/css" />
 	<link rel="stylesheet" href="css/formee-structure.css" type="text/css" />
 	
-<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+	<script src="../js/jquery.ui.datepicker-mk.js"></script>
+	<script src="../js/jquery-time-picker.js"></script>
 
 	<!--- Javascript libraries (jQuery and Selectivizr) used for the custom checkbox --->
 

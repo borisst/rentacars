@@ -49,10 +49,17 @@ require("CarReservation.class.php");
 		</style>
 	  
 		<script>
+		var now = new Date();
+		var outStr = now.getHours()+':'+now.getMinutes();
 		$(function() {
+			
 			  $('#datepicker').datetimepicker({
 			      showMonthAfterYear: false,
-			      minDate:0
+			      minDate:0,
+			      hour: now.getHours(),
+			      minute: now.getMinutes(),
+			   //   stepMinute: '15',
+			    	  controlType: 'select'
 			    },
 			    $.datepicker.regional['mk']
 			  );
@@ -63,15 +70,19 @@ require("CarReservation.class.php");
 		$(function() {
 			  $('#datepicker1').datetimepicker({
 			      showMonthAfterYear: false,
-			      minDate:+1
+			      minDate:+1,
+			      hour: now.getHours(),
+			      minute: now.getMinutes(),
+			      controlType: 'select'
+			   //   stepMinute: '15'
 			    },
-			    $.datepicker.regional['mk-MK']
+			    $.datepicker.regional['mk']
 			  );
 			});
 				
-			   $(function() {
-			    $( "#datepicker1" ).datepicker($.datepicker.regional[ "mk-MK" ]);
-			  });
+
+
+			  
 			  function showFirst()
 			  {
 				_("Vtor").style.display = "none";
@@ -237,23 +248,33 @@ require("CarReservation.class.php");
 	            }
 	            //If form is validated enable form
 	            if(validated) {
-	            	var d1 = new Date($('#datepicker').val());
-		            var d2 = new Date($('#datepicker1').val());
-
-		            console.log($('#datepicker').val());
-		            console.log(Math.round(d1.getTime()));
-		            console.log(Math.round(d2.getTime()));
-		            var diff =  Math.floor((d2.getTime() - d1.getTime()) / 86400000);
-		            
-		            if(diff > 0){		
-		            	$("input#vkupno-denovi-input").val(diff);
-			            $("#vkupno-denovi").text("Вкупно денови "+diff).removeAttr( 'style' );            
-		           	 	$("input#button-show-second").removeAttr("disabled"); 
-		            }
-		            else{
-		            	$("#vkupno-denovi").text('<?php echo "Најмал период на резервација е 24 часа"?>').css('color','red');
-		            	$("input#button-show-second").prop('disabled', true);
-			        }
+					var d1 = $('#datepicker').val();
+					var d2 = $('#datepicker1').val();
+	            //	var d1 = new Date($('#datepicker').val());
+		          //  var d2 = new Date($('#datepicker1').val());
+		            $.ajax({
+						   type: "GET",
+						   url: "action.php",
+						   data: { d1:d1, d2:d2,date:'date'}
+						   }).done(function( data ) {
+								var obj = jQuery.parseJSON(data);
+							  // console.log(obj.d);
+							  // console.log(obj.h);
+							  var d = obj.d;
+							  if(obj.d>=0){
+								if(obj.h>0){
+									d = obj.d+1;
+								}
+								
+							    $("input#vkupno-denovi-input").val(d);
+					            $("#vkupno-denovi").text("Вкупно денови: "+d).removeAttr( 'style' );            
+				           	 	$("input#button-show-second").removeAttr("disabled"); 	
+							  }						   
+					            else{
+					            	$("#vkupno-denovi").text('<?php echo "Имате изберено погрешен датум"?>').css('color','red');
+					            	$("input#button-show-second").prop('disabled', true);
+						      }
+						  });            
 	            }
 	            else{
 	            	$("input#button-show-second").prop('disabled', true);
@@ -267,18 +288,30 @@ require("CarReservation.class.php");
 	            }
 	            //If form is validated enable form
 	            if(validated) {
-	            	 var d1 = new Date($('#datepicker').val());
-			         var d2 = new Date($('#datepicker1').val());
-			         var diff = Math.floor((d2.getTime() - d1.getTime()) / 86400000);
-			         if(diff > 0){		
-			            	$("input#vkupno-denovi-input").val(diff);
-				            $("#vkupno-denovi").text("Вкупно денови "+diff).removeAttr( 'style' );            
-			           	 	$("input#button-show-second").removeAttr("disabled"); 
-			            }
-			            else{
-			            	$("#vkupno-denovi").text('<?php echo "Најмал период на резервација е 24 часа"?>').css('color','red');
-			            	$("input#button-show-second").prop('disabled', true);
-				       }  
+	            	var d1 = $('#datepicker').val();
+	            	var d2 = $('#datepicker1').val();
+			         $.ajax({
+						   type: "GET",
+						   url: "action.php",
+						   data: { d1:d1, d2:d2,date:'date'}
+						   }).done(function( data ) {
+								var obj = jQuery.parseJSON(data);
+							  // console.log(obj.d);
+							  // console.log(obj.h);
+							var d = obj.d;
+							if(obj.d>=0){
+								if(obj.h>0){
+									d = obj.d+1;
+								}
+							    $("input#vkupno-denovi-input").val(d);
+					            $("#vkupno-denovi").text("Вкупно денови: "+d).removeAttr( 'style' );            
+				           	 	$("input#button-show-second").removeAttr("disabled"); 	
+							  }						   
+					            else{
+					            	$("#vkupno-denovi").text('<?php echo "Имате изберено погрешен датум"?>').css('color','red');
+					            	$("input#button-show-second").prop('disabled', true);
+						      }
+						  });  
 	            }
 	            else{
 	            	$("input#button-show-second").prop('disabled', true); 

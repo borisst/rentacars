@@ -2,7 +2,7 @@
 
 class Validation
 {
-	function name_validation($name, $field = 'Name', $min_length = 3, $max_length = 33)
+	function name_validation($name, $field = 'Name', $min_length = 2, $max_length = 50)
 	{
 		// Full Name must contain letters, dashes and spaces only. We have to eliminate dash at the begining of the name.
 		$name = trim($name);
@@ -16,7 +16,11 @@ class Validation
 				else $error = null;*/
 				$error = null;
 			}else $error = 'Може да биде највеќе '.$max_length.' знака.';
-		}else $error = 'Треба да има најмалку '.$min_length.' знака.';
+		}else 
+			{
+				$error = 'Внеси '.$field;
+			
+			}
 		
 		return $error;
 		
@@ -26,7 +30,7 @@ class Validation
 		*/
 	}
 	
-	function email_validation($email, $email_label)
+	function email_validation($email, $email_label='E-mail')
 	{
 		//E-mail validation: We use regexp to validate email.
 		$email = trim($email);
@@ -35,21 +39,21 @@ class Validation
 			if(preg_match("/^[a-zA-Z]\w+(\.\w+)*\@\w+(\.[0-9a-zA-Z]+)*\.[a-zA-Z]{2,4}$/", $email) === 0)
 				$error = 'Внесете валидна емаил адреса';
 			else $error = null;
-		}else $error = 'Внесете ја вашата емаил адреса';
+		}else $error = 'Внесете емаил адреса';
 		
 		return $error;
 	}
 	
-	function digits_validation($digits, $digits_label)
+	function digits_validation($digits, $digits_label=null)
 	{
 		//Value must be digits.
 		$digits = trim($digits);
 		if (strlen($digits) >= 1 )
 		{
 			if(preg_match("/^[0-9]+$/", $digits) === 0)
-				$error = 'Внесете валиден телефонски број';
+				$error = 'Внесете валиден '.$digits_label;
 			else $error = null;
-		}else $error = 'Внесете го вашиот телефонски број';
+		}else $error = 'Внесете '.$digits_label;
 		
 		return $error;
 	}
@@ -68,16 +72,16 @@ class Validation
 		return $error;
 	}
 	
-	function date_validation($date, $date_label)
+	function date_validation($date, $date_label=NULL)
 	{
 		//Date must be with this form: YYYY-MM-DD.
 		$date = trim($date);
 		if (strlen($date) >= 1 )
 		{
-			if(preg_match("/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/", $date) === 0)
-				$error = $date_label.' Date must be with this form: YYYY-MM-DD.';
+			if(preg_match("/^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$/", $date) === 0)
+				$error = ' Невалидна дата';
 			else $error = null;
-		}else $error = 'You have to enter your '.$date_label;
+		}else $error = 'Внеси '.$date_label;
 		
 		return $error;
 	}
@@ -99,6 +103,10 @@ class Validation
 		
 		return $error;
 	}
+
+	function car_licence_validation($address, $required, $address_label)
+	{
+	}	
 	
 	function password_validation($password, $level, $password_label)
 	{

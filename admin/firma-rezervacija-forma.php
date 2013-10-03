@@ -1,11 +1,12 @@
-			<?php //print_r($get_rezervation_detail)?>
+			<?php print_r($get_rezervation_detail)?>
 			<form id="forma" class="formee" method="post">
+			<input name="dogovor" type="hidden" value="dogovor"/>
 		    <fieldset>
 		    	<div id="detali-rezervacija">
 			        <p class="datum-izdavanje">Договор <b><?php echo $get_rezervation_detail['DOK_ID']?></b></p>
-					<input name="dokid" type="hiden" value="<?php echo $get_rezervation_detail['DOK_ID']?>">		
+					<input name="dokid" type="hidden" value="<?php echo $get_rezervation_detail['DOK_ID']?>">		
 					<p class="datum-izdavanje">Датум на резервирање <b><?php echo $get_rezervation_detail['DATUM']?></b></p>
-			        <input name="DATUM" type="hiden" value="<?php echo $get_rezervation_detail['DATUM']?>">	
+			        <input name="DATUM" type="hidden" value="<?php echo $get_rezervation_detail['DATUM']?>">	
 				       <?php //print_r($get_rezervation_detail)?>         
 				      <div class="grid-3-12">          
 				            <select id="status" name="STATUS">
@@ -21,18 +22,23 @@
 				        <div class="grid-3-12">
 					        <label for="kontakt-lice">Контакт лице</label>
 					        <input id="kontakt-lice" name="KONTAKT_LICE" class="forma-kontakt-lice" type="text" value="<?php echo $get_rezervation_detail['KONTAKT_LICE']?>">
+				        	<div id="klice_error" class="error"></div>
 				        </div>
 				        <div class="grid-3-12">
 					        <label for="embg">ЕМБГ</label>
 					        <input id="embg" name="EMBG" class="forma-kontakt-lice" type="text" value="">
+					        <div id="embg_error" class="error"></div>
 				        </div>
 				        <div class="grid-3-12">
-					        <label for="roden-vo">Роден во</label>
-					        <input id="roden-vo" name="EMBG_MESTO" type="text" value="">
+					        <label for="embg_mesto">Роден во</label>
+					        <input id="embg_mesto" name="EMBG_MESTO" type="text" value="">
+					        <div id="embg_mesto_error" class="error"></div>
+					        
 				        </div>
 				        <div class="grid-3-12">
-					        <label for="data-ragjanje">Дата на раѓање</label>
-					        <input id="data-ragjanje" name="EMBG_DATA" type="text" value="">
+					        <label for="embg_data">Дата на раѓање</label>
+					        <input id="embg_data" name="EMBG_DATA" type="text" value="">
+					        <div id="embg_data_error" class="error"></div>
 				        </div>
 			        </div>
 			        <div style="width:80%">
@@ -65,8 +71,9 @@
 			        </div>
 			        <div style="width:80%">
 				        <div class="grid-3-12">
-					       	<label for="br-vozacka">Број на возачка</label>
-					        <input id="br-vozacka" type="text" name="VOZACKA_BROJ" value="">
+					       	<label for="vozacka_broj">Број на возачка</label>
+					        <input id="vozacka_broj" type="text" name="VOZACKA_BROJ" value="">
+					        <div id="vozacka_broj_error" class="error"></div>
 				        </div>
 				        <div class="grid-3-12">
 				        	<label for="data-izdavanje-vozacka">Издадена на</label>
@@ -79,51 +86,53 @@
 			   		 </div>
 			   		 <div style="width:80%">
 				   		 <div class="grid-3-12">
-					       	<label for="tel">Тел</label>
-					        <input id="tel" type="text" name="KONTAKT_TEL" value="<?php echo $get_rezervation_detail['KONTAKT_TEL']?>">
+					       	<label for="kontakt_tel">Тел</label>
+					        <input id="kontakt_tel" type="text" name="KONTAKT_TEL" value="<?php echo $get_rezervation_detail['KONTAKT_TEL']?>">
+				        	<div id="kontakt_tel_error" class="error"></div>
 				        </div>
 				        <div class="grid-3-12">
-					        <label for="email">Емаил</label>
-					        <input id="email" type="text" name="KONTAKT_EMAIL" value="<?php echo $get_rezervation_detail['KONTAKT_EMAIL']?>">
+					        <label for="kontakt_email">Емаил</label>
+					        <input id="kontakt_email" type="text" name="KONTAKT_EMAIL" value="<?php echo $get_rezervation_detail['KONTAKT_EMAIL']?>">
+				        	<div id="kontakt_email_error" class="error"></div>
 				        </div>		
 			        </div>        
 		        </fieldset>
 		        <fieldset>		   
 		        	<div style="width:100%">
 			        	<legend>Возило</legend>   
-					<input name="CAR_ID" type="hiden" value="<?php echo $get_rezervation_detail['CAR_ID']?>">		
+					<input name="CAR_ID" type="hidden" value="<?php echo $get_rezervation_detail['CAR_ID']?>">		
 			        	
 			        	<div class="grid-3-12">  
 					        <label for="marka">Марка</label>
-					        <input id="marka"  type="text" value="<?php echo $get_rezervation_detail['MARKA']?>">
+					        <input id="marka"  disabled type="text" value="<?php echo $get_rezervation_detail['MARKA']?>">
 				        </div>
 				        <div class="grid-3-12">
 					        <label for="model">Модел</label>
-					        <input id="model"  type="text" value="<?php echo $get_rezervation_detail['MODEL']?>">
+					        <input id="model"   disabled type="text" value="<?php echo $get_rezervation_detail['MODEL']?>">
 				        </div>
 				        <div class="grid-3-12">
 					        <label for="registracija">Регистрација</label>
-					        <input id="registracija"  type="text" value="<?php echo $get_rezervation_detail['REGISTRACIJA']?>">
+					        <input id="registracija"  disabled type="text" value="<?php echo $get_rezervation_detail['REGISTRACIJA']?>">
 				       </div>
 				       <div class="grid-3-12">
 					        <label for="reg_do">Регистрирана до</label>
-					        <input id="reg_do"  type="text" value="<?php echo $get_rezervation_detail['REG_DO']?>">
+					        <input id="reg_do"   disabled type="text" value="<?php echo $get_rezervation_detail['REG_DO']?>">
 				        </div>
 				        <div class="grid-2-12">
 					        <label for="proizvodstvo">Година</label>
-					        <input id="proizvodstvo"  type="text" value="<?php echo $get_rezervation_detail['PROIZVODSTVO']?>">
+					        <input id="proizvodstvo"  disabled type="text" value="<?php echo $get_rezervation_detail['PROIZVODSTVO']?>">
 				        </div>
 				        <div class="grid-2-12">
 					        <label for="BR_VRATI">Број на врати</label>
-					        <input id="BR_VRATI" name="BR_VRATI" type="text" value="<?php echo $get_rezervation_detail['BR_VRATI']?>">
+					        <input id="BR_VRATI"  disabled name="BR_VRATI" type="text" value="<?php echo $get_rezervation_detail['BR_VRATI']?>">
 						</div>
 						<div class="grid-2-12">
 					        <label for="moknost">Моќност</label>
-					        <input id="moknost"  type="text" value="<?php echo $get_rezervation_detail['MOKNOST_KW']?>">
+					        <input id="moknost"  disabled type="text" value="<?php echo $get_rezervation_detail['MOKNOST_KW']?>">
 				        </div>
 				        <div class="grid-2-12">
 					        <label for="zafatnina">Зафатнина</label>
-					        <input id="zafatnina" type="text" value="<?php echo $get_rezervation_detail['ZAFATNINA']?>">
+					        <input id="zafatnina"  disabled type="text" value="<?php echo $get_rezervation_detail['ZAFATNINA']?>">
 						</div>
 						<div class="grid-2-12">
 					        <label>Тип на гориво</label>
@@ -210,11 +219,11 @@
 			            
 			            <div class="grid-6-12">
 			                <label for="vrakane">Враќање</label>
-							<input id="vrakane" name="DATUM_KRAJ" type="text" value="<?php echo $get_rezervation_detail['DATUM_KRAJ']?>">
+							<input id="vrakane" name="DATUM_KRAJ" type="text" value="">
 			            </div>
 						<div class="grid-6-12">
 			                <label for="mesto-vrakane">Место</label>
-							<input id="mesto-vrakane" name="MESTO_KRAJ" type="text" value="<?php echo $get_rezervation_detail['MESTO_KRAJ']?>">
+							<input id="mesto-vrakane" name="MESTO_KRAJ" type="text" value="">
 			            </div>		            
 			        </div>
 			        <div style="width:100%">
@@ -391,6 +400,7 @@
 		        </fieldset>
 		        <fieldset>
 			        <div style="width:100%; text-align:center">
+			        	<div id="validation"></div>
 				        <div class="grid-12-12">
 							<input type="submit" name="zacuvaj" value="Зачувај"/>
 							<input type="submit" name="pregledaj"  value="Прегледај"/>
@@ -402,6 +412,20 @@
 <script type="text/javascript">
 $( "#tabs" ).tabs();
 $( "#tabs2" ).tabs();
+
+function error_style(key, val){
+	var validate = 'false';
+  	$('#'+key).html(val);	
+  	$( "#"+key.replace(/_error/g,"") ).addClass( "input-validation-error" );
+  	if($( "#validation" ).hasClass( "validation" )){
+  		$( "#validation" ).append('<br />'+val);
+  	}
+  	else{
+  		$( "#validation" ).addClass( "validation" ).html(val);
+  	}
+  	console.log(val+' '+key);	
+}
+
 $("form#forma").submit(function(e){     
    	e.preventDefault();    
          
@@ -409,37 +433,20 @@ $("form#forma").submit(function(e){
 	        $("form#forma").serialize(),
 	        function(data){
         		
-	        		$('#fname_error').empty();
-	        		$('#lname_error').empty();
-	        		$('#phone_error').empty();
-	        		$('#email_error').empty();
+	        		$( "#validation" ).removeClass( "validation" );
+	        		$( "#validation" ).html( "" );
 	        		console.log(data);
 	        		if(data !== null){
-				        if((data.fname_error !== null)){
-					        if(data.fname_error !== null){
-					            var validate = 'false';
-					          	$('#fname_error').html(data.fname_error);	
-					          	console.log('1'+validate);		 
-				        	}         	
-				        }
-				        else if(data.lname_error !== null){
-				        	var validate = 'false';
-				        	$('#lname_error').html(data.lname_error); 
-				        	console.log('3'+validate);
-				       
-				        }
-				        else if(data.phone_error !== null){
-				        	var validate = 'false';
-				        	$('#phone_error').html(data.phone_error);
-				        	console.log('5'+validate);	
-				        	
-				        }
-				        else if(data.email_error !== null){
-				        	var validate = 'false';
-				        	$('#email_error').html(data.email_error); 
-				        	console.log('7'+validate);	
-				        	
-				        }
+	        			 $.each( data, function( key, val ) {
+	        				 //kod
+	        				 $('#'+key).empty();
+	        				 $( "#"+key ).removeClass( "input-validation-error" );
+	        				 
+	        				 if(val !== null){
+	        				 	error_style(key, val);
+	        				 }
+	        			});
+				        
 	        		}
 			        else{
 			        	var validate = 'true';
@@ -454,4 +461,34 @@ $("form#forma").submit(function(e){
     		}, 
     	"json");     
 });	
+
+var now = new Date();
+var outStr = now.getHours()+':'+now.getMinutes();
+$(function() {
+	
+	  $('#embg_data').datepicker({
+	    },
+	    $.datepicker.regional['mk']
+	  );
+
+	  $('#data-izdavanje-vozacka').datepicker({
+	    },
+	    $.datepicker.regional['mk']
+	  );
+
+	  $('#data-izdavanje-pasos').datepicker({
+	    },
+	    $.datepicker.regional['mk']
+	  );
+
+	  $('#data-izdavanje-lk').datepicker({
+	    },
+	    $.datepicker.regional['mk']
+	  );
+	  $('#reg_do').datepicker({
+	    },
+	    $.datepicker.regional['mk']
+	  );
+	});
+
 </script>

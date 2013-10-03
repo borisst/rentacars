@@ -45,8 +45,6 @@ class Database{
 	private	$user     = ""; //database login name
 	private	$pass     = ""; //database login password
 	private	$database = ""; //database name
- private	$port = ""; //database port
-
 
 	private	$error = "";
 
@@ -60,7 +58,7 @@ class Database{
 
 #-#############################################
 # desc: constructor
-private function __construct($server=null, $user=null, $pass=null, $database=null, $port=null){
+private function __construct($server=null, $user=null, $pass=null, $database=null){
 	// error catching if not passed in
 	if($server==null || $user==null || $database==null){
 		$this->oops("Database information must be passed in when the object is first created.");
@@ -70,15 +68,14 @@ private function __construct($server=null, $user=null, $pass=null, $database=nul
 	$this->user=$user;
 	$this->pass=$pass;
 	$this->database=$database;
- $this->port = $port;
 }#-#constructor()
 
 
 #-#############################################
 # desc: singleton declaration
-public static function obtain($server=null, $user=null, $pass=null, $database=null, $port=null){
+public static function obtain($server=null, $user=null, $pass=null, $database=null){
 	if (!self::$instance){ 
-		self::$instance = new Database($server, $user, $pass, $database, $port=null); 
+		self::$instance = new Database($server, $user, $pass, $database); 
 	} 
 
 	return self::$instance; 
@@ -89,7 +86,7 @@ public static function obtain($server=null, $user=null, $pass=null, $database=nu
 # desc: connect and select database using vars above
 # Param: $new_link can force connect() to open a new link, even if mysql_connect() was called before with the same parameters
 public function connect($new_link=false){
-	$this->link_id=@mysql_connect($this->server,$this->user,$this->pass,$new_link $this->port);
+	$this->link_id=@mysql_connect($this->server,$this->user,$this->pass,$new_link);
 
 	if (!$this->link_id){//open failed
 		$this->oops("Could not connect to server: <b>$this->server</b>.");

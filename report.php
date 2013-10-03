@@ -1,14 +1,5 @@
 <?php session_start();?>
-<style>
-dl { 
-	border: 3px double #ccc; 
-	padding: 0.5em;
-	font-size: 16px;
-}
-dt { float: left; clear: left; width: 280px; text-align: right; font-weight: bold; color: green; }
-dt:after { content: ":"; }
-dd { margin: 0 0 0 110px; padding: 0 0 1.5em 0; }
-</style>
+
 <div>
 	<dl>
 		<dt><b>Договор број</b></dt>

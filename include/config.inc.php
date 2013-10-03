@@ -1,7 +1,5 @@
 <?php
-
 $services_json = json_decode(getenv("VCAP_SERVICES"),true);
-
 $mysql_config = $services_json["mysql-5.1"][0]["credentials"];
 $username = $mysql_config["username"];
 $password = $mysql_config["password"];
@@ -22,6 +20,7 @@ define('DB_PASS', $password);
 //database name
 define('DB_DATABASE', $dbname);
 define('DB_PORT', $port);
+
 
 //smart to define your table names also
 define('TABLE_CARS_KLASI', "cars_klasi");
