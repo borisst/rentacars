@@ -15,8 +15,8 @@ class Validation
 					$error = 'moze da sodrzi samo bukvi, -';
 				else $error = null;*/
 				$error = null;
-			}else $error = $field.' potrebno e da bide najveke '.$max_length.' znaka.';
-		}else $error = $field.' potrebno e da bide najmalku '.$min_length.' znaka.';
+			}else $error = 'Може да биде највеќе '.$max_length.' знака.';
+		}else $error = 'Треба да има најмалку '.$min_length.' знака.';
 		
 		return $error;
 		
@@ -33,9 +33,9 @@ class Validation
 		if (strlen($email) >= 1 )
 		{
 			if(preg_match("/^[a-zA-Z]\w+(\.\w+)*\@\w+(\.[0-9a-zA-Z]+)*\.[a-zA-Z]{2,4}$/", $email) === 0)
-				$error = 'Vnesete validna '.$email_label;
+				$error = 'Внесете валидна емаил адреса';
 			else $error = null;
-		}else $error = 'Vnesete ja vasata '.$email_label;
+		}else $error = 'Внесете ја вашата емаил адреса';
 		
 		return $error;
 	}
@@ -47,9 +47,9 @@ class Validation
 		if (strlen($digits) >= 1 )
 		{
 			if(preg_match("/^[0-9]+$/", $digits) === 0)
-				$error = 'You have to enter a valid '.$digits_label;
+				$error = 'Внесете валиден телефонски број';
 			else $error = null;
-		}else $error = 'You have to enter your '.$digits_label;
+		}else $error = 'Внесете го вашиот телефонски број';
 		
 		return $error;
 	}

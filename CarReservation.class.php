@@ -84,11 +84,13 @@ class CarReservation {
 		//yy - godina
 		//xxxxxx - increment na posledniot vnes vo bazata
 		//se vnesuvaat podatocite vo bazata
+		$firma = $this->get_firma();
+		$firmaid = $firma['FIRMAID'];
 		$sql = "SELECT * 
 				FROM ".TABLE_RENT_REZERVACII."
 				WHERE dok_id = ( 
 				SELECT MAX( dok_id ) 
-				FROM ".TABLE_RENT_REZERVACII.")";	
+				FROM ".TABLE_RENT_REZERVACII." ) AND FIRMAID = $firmaid";	
 		$rows = $this->db->fetch_all_array($sql);
 		foreach($rows as $record){ 
 			$dok_id= $record['DOK_ID'];
@@ -109,8 +111,8 @@ class CarReservation {
 		$data['DATUM'] = date('Y-m-d H:i:s');
 		$data['CENA'] = $cena;
 		$data['DENOVI'] = $denovi;
-		$firma = $this->get_firma();
-		$data['FIRMAID'] = $firma['FIRMAID'];
+
+		$data['FIRMAID'] = $firmaid;
 		$data['KONTAKT_EMAIL'] = $email;
 		$data['STATUS'] = 'R';//prvicen status na rezervacijata, koga e potvrdena se dobiva status P
 		try {
@@ -123,7 +125,7 @@ class CarReservation {
 		try{
       # First, instantiate the SDK with your API credentials and define your domain. 
       $firma_detail =  $this->get_firma();
-			$this->send_mail($email,$firma_detail);
+			//$this->send_mail($email,$firma_detail);
 			//mail($email, 'Ime na firma -rent a car',$data['KONTAKT_LICE'], "From:no-replay@email.com");
 		}catch (Exception $e){
 			return $e->getMessage();
@@ -163,7 +165,7 @@ class CarReservation {
 		$price = "";
 			foreach($rows as $record){ 
 				$cena = $record["vrati_cena('$car_id', '$zona', '$denovi')"];
-				$price .= 'Cenata e:'.$cena.'<input type="hidden" name="cena" value="'.$cena.'"/> denari';
+				$price .= 'Цената е:'.$cena.'<input type="hidden" name="cena" value="'.$cena.'"/> денари';
 			}
 		if(!$value){
 			return json_encode($price);
@@ -213,8 +215,8 @@ class CarReservation {
         and slobodno_vozilo(car_id, '$datum_od', '$datum_do','') =  '1'
 			order by marka, model, tip_gorivo, tip_menuvac, zafatnina, proizvodstvo;";
 			$rows = $this->db->fetch_all_array($sql); 
-			$cars_dropdown = '<select id="car-choice-select" name="car-choice">';
-			$cars_dropdown .= '<option value="" selected>--Izberi marka na mozilo--</option>';
+			$cars_dropdown = '<label>Избери модел на возило</label><select id="car-choice-select" name="car-choice">';
+			$cars_dropdown .= '<option value="" selected>--Избери модел на возило--</option>';
 			foreach($rows as $record){ 
 				$cars_dropdown .= '<option value="'.$record['car_id'].'">'.$record['marka'].'-'.$record['model'].'-'.$record['PROIZVODSTVO'].'</option>';
 			}
@@ -222,7 +224,7 @@ class CarReservation {
 			return json_encode($cars_dropdown);
 		}
 		else{
-			return "Izberi klasa na vozilo";
+			return "Избери класа на возило";
 		}
 	}
 	
@@ -398,6 +400,32 @@ $headers = array(
 			}
 		}
 	}	
-
+	
+	public function insert_data_dogovor($firmaid= null, $data){
+		if(!empty($data)){
+			//proverka dali e logiran korisnikot
+			if($this->login_check()){
+				$dokidr = $data['dokid'];
+				//brisanje na prviot znak i formiranje na novo dok_id za rent_rezervacii
+				$dokidr = substr($dokidr, 1);
+				$formatted_firmid_num = sprintf("%03d", $firmaid);
+				$dokid = substr_replace($dokidr, $firmaid, 2, 0);
+				$dokid = intval($dokid); //nov dok_id za vo tabela rent_dogovor
+				
+				$this->db_select(); 
+				$this->db->connect();
+				
+				try {
+			  		$this->db->query_insert(TABLE_RENT_DOGOVOR, $data);
+				} catch (Exception $e) {
+			    	return  $e->getMessage();
+				}
+				return $result;
+			}
+			else{
+				die('carclas-ERROR-103 Acces Denied');
+			}
+		}
+	}
 }
 ?>
