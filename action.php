@@ -83,24 +83,54 @@ if($_GET){
 		$_SESSION['form1']['car-model']= clean($_GET['text'], $cr);
 		price($car_id, $zona, $denovi, $cr);
 	}
+	if(isset($_GET['dataOd'])){
+		echo json_encode($cr->date_convert($_GET['dataOd']));
+	}
 	if(isset($_GET['date'])){
 		$d1 = $_GET['d1'];
 		$d2 = $_GET['d2'];
 		//echo $d1;
-		$date1 = date_create_from_format('d/m/Y H:i', $d1);
-		$date2 = date_create_from_format('d/m/Y H:i', $d2);
+		$date1 = $cr->date_convert($d1, true);
+		$date2 = $cr->date_convert($d2, true);
+	//	$date1 = date_create_from_format('d/m/Y H:i', $d1);
+	//	$date2 = date_create_from_format('d/m/Y H:i', $d2);
 		
-		$date1 = date_format($date1, 'Y-m-d H:i');
-		$date2 = date_format($date2, 'Y-m-d H:i');
+	//	$date1 = date_format($date1, 'Y-m-d H:i');
+	//	$date2 = date_format($date2, 'Y-m-d H:i');
 		//echo date("Y-m-d H:i", strtotime($date1));
-		
-		$dStart = new DateTime(date("Y-m-d H:i", strtotime($date1)));
-	    $dEnd  = new DateTime(date("Y-m-d H:i", strtotime($date2)));
-	    $dDiff = $dStart->diff($dEnd);
-	    $d['d'] = $dDiff->d;
+
+		$dStart = new DateTime($date1);
+	    $dEnd  = new DateTime($date2);
+	    $dDiff = $dStart->diff($dEnd);;
+	    $d['d'] = $dDiff->days;
 	    $d['h'] = $dDiff->h;
+	    if($dDiff->invert != 0) {
+	    	$d['d'] = -$dDiff->days;
+	    }
 	    echo json_encode($d);
 	   // echo $dDiff->d.' '.$dDiff->h;
+	}
+	if(isset($_GET['mesto'])){
+		$mesto = $_GET['mesto'];
+		$html = '
+		<ul class="lokacija '.$mesto.'">
+		    <li>
+		      <h3>Берово</h3>
+		    </li>
+		       
+		    <li>
+		      <h3>Сkopje</h3>
+		    </li>
+		 
+		    <li>
+		      <h3>Штип</h3>
+		    </li>
+		 
+		    <li>
+		      <h3>Струмица</h3>
+		    </li>
+		  </ul>';
+		echo $html;
 	}
 	
 }

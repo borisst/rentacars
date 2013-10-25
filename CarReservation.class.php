@@ -57,8 +57,10 @@ class CarReservation {
 		$tel = $this->clean($data_post['tel']);
 		$email = $this->clean($data_post['email']);
 		$cena = $this->clean($data_post['cena']);
+		$mesto_poc = $this->clean($data_post['mesto_poc']);
+		$mesto_kraj = $this->clean($data_post['mesto_kraj']);
+		$zabeleska = $this->clean($data_post['zabeleska']);
 		
-
 		$datetime1 = new DateTime($datum_od);
 		$datetime2 = new DateTime($datum_do);
 		$interval = $datetime1->diff($datetime2);
@@ -75,7 +77,8 @@ class CarReservation {
 		$_SESSION['form1']['email'] = $email; // store session data
 		$_SESSION['form1']['cena'] = $cena; // store session data
 		$_SESSION['form1']['denovi'] = $denovi; // store session data
-		
+		$_SESSION['form1']['mesto_poc'] = $mesto_poc; // store session data
+		$_SESSION['form1']['mesto_kraj'] = $mesto_kraj; // store session data
 		
 		$this->db_select(); 
 		$this->db->connect(); 
@@ -111,7 +114,10 @@ class CarReservation {
 		$data['DATUM'] = date('Y-m-d H:i:s');
 		$data['CENA'] = $cena;
 		$data['DENOVI'] = $denovi;
-
+		$data['ZABELESKA'] = $zabeleska;
+	//	$data['MESTO_POC'] = $mesto_poc;
+	//	$data['MESTO_KRAJ'] = $mesto_kraj;
+		
 		$data['FIRMAID'] = $firmaid;
 		$data['KONTAKT_EMAIL'] = $email;
 		$data['STATUS'] = 'R';//prvicen status na rezervacijata, koga e potvrdena se dobiva status P
@@ -201,8 +207,9 @@ class CarReservation {
 	public function car_choise($car_clas = null, $datum_od = null, $datum_do = null){
 		if(!empty($car_clas)){
 			$this->db_select();
-			$datum_od = date_format(date_create($datum_od),"Y-m-d");
-			$datum_do = date_format(date_create($datum_do),"Y-m-d");
+			
+			$datum_do = $this->date_convert($datum_do, true);
+			$datum_od = $this->date_convert($datum_od, true);
 			$this->db->connect(); 		
 			$sql = "select car_id, marka, model, registracija, tip_gorivo, tip_menuvac, tekovna_lokacija, zafatnina, 
 			MOKNOST_KW , BR_VRATI, reg_do, PROIZVODSTVO, OPREMA_KLIMA, OPREMA_EL_PROZORI, OPREMA_CENTR_BRAVA, 
@@ -211,14 +218,20 @@ class CarReservation {
 			from cars 
 			where otpisan_datum is null
 			  and KLASA = '$car_clas'
-        and ifnull(tekovna_lokacija, 'M') not in ('S', 'P')
-        and slobodno_vozilo(car_id, '$datum_od', '$datum_do','') =  '1'
-			order by marka, model, tip_gorivo, tip_menuvac, zafatnina, proizvodstvo;";
+        		and ifnull(tekovna_lokacija, 'M') not in ('S', 'P')
+        		and slobodno_vozilo(car_id, '$datum_od', '$datum_do','') =  '1'
+			order by marka, model, tip_gorivo, tip_menuvac, registracija, zafatnina, proizvodstvo;";
 			$rows = $this->db->fetch_all_array($sql); 
 			$cars_dropdown = '<label>Избери модел на возило</label><select id="car-choice-select" name="car-choice">';
 			$cars_dropdown .= '<option value="" selected>--Избери модел на возило--</option>';
 			foreach($rows as $record){ 
-				$cars_dropdown .= '<option value="'.$record['car_id'].'">'.$record['marka'].'-'.$record['model'].'-'.$record['PROIZVODSTVO'].'</option>';
+				if($record['tip_gorivo']== 'D'){
+					$tip_gorivo = "Дизел";
+				}
+				else{
+					$tip_gorivo = "Бензин";
+				}
+				$cars_dropdown .= '<option value="'.$record['car_id'].'">'.$record['model'].'-'.$tip_gorivo.'-'.$record['tip_menuvac'].'-'.$record['BR_VRATI'].' врати'.'</option>';
 			}
 			$cars_dropdown .= '</select>';
 			return json_encode($cars_dropdown);
@@ -226,6 +239,27 @@ class CarReservation {
 		else{
 			return "Избери класа на возило";
 		}
+	}
+	
+	/**
+	 * 
+	 * Konvertiranje na datum od vid dd/mm/yyyy H:i vo yyyy-mm-dd H:i:s
+	 * @param string $date_time_string
+	 * @param bulean $time
+	 */
+	public function date_convert($date_time_string, $time=false){
+		$date_time = explode(' ', $date_time_string);
+		$date = $date_time[0];
+		$time= $date_time[1];
+		$dmy = explode('/', $date); //d-day m=month y-year = dmy array
+		$Hi = explode(':', $time); //H-houre i-minute = Hi array
+		if($time){
+			$newDate = date("Y-m-d H:i", mktime($Hi['0'], $Hi['1'], 0, $dmy['1'], $dmy['0'], $dmy['2']));
+		}
+		else{
+			$newDate = date("Y-m-d", mktime($Hi['0'], $Hi['1'], 0, $dmy['1'], $dmy['0'], $dmy['2']));
+		}
+		return  $newDate;
 	}
 	
 		/**
