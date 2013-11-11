@@ -154,6 +154,54 @@ class Validation
 		return $error;
 	}
 	
+	/**
+	 * 
+	 * Валидација за македонски матичен број 
+	 * на родени од 1900 до 2899 год
+	 * @param string $embg
+	 * @param string $msg
+	 */
+	public function embg_validation($embg = NULL, $msg=null){
+		//prazen string
+		if(empty($embg)){
+			$error = 'Внесете '.$msg;
+		}
+		else{
+			//razlicno od 13 brojki
+			if(strlen($embg)!=13){
+				$error = 'Погрешен '.$msg;
+			}else{
+				//ako nekoj od znacite ne e broj
+				for ($i=0; $i++; $i<=12){
+					if(!is_int($embg[$i])){
+						$error = 'Погрешен '.$msg;
+					}
+				}
+				
+				$d = substr($embg, 0,2);
+				$m = substr($embg, 2,2);
+				$y = substr($embg, 4,3);
+				$code = substr($embg, 6,6);
+				$stotki = substr($y, 0,1);
+				if($stotki == 9){
+					$iljadarki = 1;
+				}
+				else{
+					$iljadarki = 2;
+				}
+				$year = $iljadarki.$y;
+				$is_valid_date = checkdate($m, $d, $year);
+				if(!$is_valid_date){
+					$error = 'Погрешен '.$msg;
+				}
+				else{
+					$error = null;
+				}
+			}
+		}
+		return $error;
+	}
+	
 	
 };
 ?>

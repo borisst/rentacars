@@ -87,8 +87,15 @@ class CarReservation {
 		//yy - godina
 		//xxxxxx - increment na posledniot vnes vo bazata
 		//se vnesuvaat podatocite vo bazata
+		
+		//se upotrebuva funkcijata za nov broj na rezervacija koja se naogja vo bazata, vrati_nova_rez_id
 		$firma = $this->get_firma();
 		$firmaid = $firma['FIRMAID'];
+		$sql = "SELECT vrati_nova_rez_id('$firmaid')";
+		$result = $this->db->query_first($sql);
+		$dok_id = $result["vrati_nova_rez_id('$firmaid')"];
+				
+		/*
 		$sql = "SELECT * 
 				FROM ".TABLE_RENT_REZERVACII."
 				WHERE dok_id = ( 
@@ -103,18 +110,22 @@ class CarReservation {
 		$formatted_id_num = sprintf("%06d", $id_num);
 		$year = date('y');
 		$dok_id = 'R'.$year.$formatted_id_num;
+		*/
 		$_SESSION['form1']['dok_id'] = $dok_id; // store session data
 		$data['DOK_ID'] = $dok_id;
 		$data['KONTAKT_LICE']=$firstname.' '.$lastname;
 		$data['KONTAKT_TEL'] = $tel;
 		$data['DATUM_POC'] = $datum_od;
-		$data['DATUM_KRAJ'] = $datum_do;
+		$data['DATUM_KRAJ'] = $datum_do;		
+		$data['PREDV_DATUM_KRAJ'] = $datum_do;	
 		$data['CAR_KLASA'] = $car_klasa;
 		$data['CAR_ID'] = $car_id;
 		$data['DATUM'] = date('Y-m-d H:i:s');
 		$data['CENA'] = $cena;
 		$data['DENOVI'] = $denovi;
 		$data['ZABELESKA'] = $zabeleska;
+
+		
 	//	$data['MESTO_POC'] = $mesto_poc;
 	//	$data['MESTO_KRAJ'] = $mesto_kraj;
 		
@@ -247,19 +258,24 @@ class CarReservation {
 	 * @param string $date_time_string
 	 * @param bulean $time
 	 */
-	public function date_convert($date_time_string, $time=false){
-		$date_time = explode(' ', $date_time_string);
-		$date = $date_time[0];
-		$time= $date_time[1];
-		$dmy = explode('/', $date); //d-day m=month y-year = dmy array
-		$Hi = explode(':', $time); //H-houre i-minute = Hi array
-		if($time){
-			$newDate = date("Y-m-d H:i", mktime($Hi['0'], $Hi['1'], 0, $dmy['1'], $dmy['0'], $dmy['2']));
+	public function date_convert($date_time_string, $time=false, $separator='/'){
+		if(!empty($date_time_string)){
+			if($time){
+				$date_time = explode(' ', $date_time_string);
+				$date = $date_time[0];
+				$time= $date_time[1];
+				$dmy = explode($separator, $date); //d-day m=month y-year = dmy array
+				$Hi = explode(':', $time); //H-houre i-minute = Hi array
+				$newDate = date("Y-m-d H:i", mktime($Hi['0'], $Hi['1'], 0, $dmy['1'], $dmy['0'], $dmy['2']));
+			}
+			else{
+				$date = $date_time_string;
+				$dmy = explode($separator, $date); //d-day m=month y-year = dmy array
+				//print_r($dmy);
+				$newDate = date("Y-m-d", mktime(0, 0, 0, intval($dmy['1']), intval($dmy['0']), intval($dmy['2'])));
+			}
+			return  $newDate;
 		}
-		else{
-			$newDate = date("Y-m-d", mktime($Hi['0'], $Hi['1'], 0, $dmy['1'], $dmy['0'], $dmy['2']));
-		}
-		return  $newDate;
 	}
 	
 		/**
@@ -274,7 +290,7 @@ class CarReservation {
 				$str = stripslashes($str);
 			}
  
-   return $str; 
+   		return $str; 
 			//return mysql_real_escape_string($str);
 		}
 	
@@ -406,7 +422,7 @@ $headers = array(
 			if($this->login_check()){
 				$this->db_select(); 
 				$this->db->connect();
-				$sql="SELECT * FROM rent_rezervacii WHERE FIRMAID = '$firmaid'";
+				$sql="SELECT * FROM rent_rezervacii WHERE FIRMAID = '$firmaid' AND STATUS = 'R'";
 				$result = $this->db->fetch_all_array($sql); 
 				return $result;
 			}
@@ -425,7 +441,9 @@ $headers = array(
 			if($this->login_check()){
 				$this->db_select(); 
 				$this->db->connect();
-				$sql="SELECT * FROM rent_rezervacii INNER JOIN cars on cars.CAR_ID=rent_rezervacii.CAR_ID WHERE rent_rezervacii.FIRMAID = '$firmaid' AND DOK_ID = '$dok_id'";
+				$sql="SELECT * FROM rent_rezervacii 
+							INNER JOIN cars on cars.CAR_ID=rent_rezervacii.CAR_ID 
+							WHERE rent_rezervacii.FIRMAID = '$firmaid' AND DOK_ID = '$dok_id'";
 				$result = $this->db->query_first($sql); 
 				return $result;
 			}
@@ -434,32 +452,179 @@ $headers = array(
 			}
 		}
 	}	
+
+	/**
+	 * 
+	 * Detali za dogovor so broj dok_id
+	 * se zima od tebelata rent_dogovor
+	 * @param int $firmaid
+	 * @param int $dok_id
+	 */
+	public function get_contract_detail($firmaid= null, $dok_id=null){
+		if(!empty($dok_id)){
+			//proverka dali e logiran korisnikot
+			if($this->login_check()){
+				$this->db_select(); 
+				$this->db->connect();
+				$sql="SELECT * FROM rent_dogovor INNER JOIN cars on cars.CAR_ID=rent_dogovor.CAR_ID WHERE rent_dogovor.FIRMAID = '$firmaid' AND DOK_ID = '$dok_id'";
+				$result = $this->db->query_first($sql); 
+				return $result;
+			}
+			else{
+				die('carclas-ERROR-106 Acces Denied');
+			}
+		}
+	}
 	
+	/**
+	 * Zapisuvanje vo tabelata rent_dogovor kako nov dogovor
+	 * brojot na dogovorot se dobiva preku funkcija vo bazata vrati_nov_dog_id
+	 * @param int $firmaid
+	 * @param array $data //podatoci koi treba da se zapisaat vo bazata, klucot vo nizata e ime na kolona vo tabelata rent_dogovor od bazata
+	 */
 	public function insert_data_dogovor($firmaid= null, $data){
 		if(!empty($data)){
 			//proverka dali e logiran korisnikot
 			if($this->login_check()){
-				$dokidr = $data['dokid'];
-				//brisanje na prviot znak i formiranje na novo dok_id za rent_rezervacii
-				$dokidr = substr($dokidr, 1);
-				$formatted_firmid_num = sprintf("%03d", $firmaid);
-				$dokid = substr_replace($dokidr, $firmaid, 2, 0);
-				$dokid = intval($dokid); //nov dok_id za vo tabela rent_dogovor
-				
 				$this->db_select(); 
 				$this->db->connect();
-				
+				//se generira broj na dogovor
+				//ako dogovorot e napraven od rezervacija se pravi update na tabelata rent_rezervacii
+				//taka sto dog_dok_id vo tabelata rent_rezervacii ke dobie vrednosta od dok_id od tabelata rent_dogovor
+				$sql = "SELECT vrati_nov_dog_id('$firmaid')";
+				$result = $this->db->query_first($sql);
+				$dokid = $result["vrati_nov_dog_id('$firmaid')"];
+				$rdokid = $data['dokid']; //broj na rezervcija vo tabelata rent_rezervacii DOK_ID
+				unset($data['dogovor']);			
+				unset($data['dokid']);
+				$data['DOK_ID'] = $dokid;
+				$data['FIRMAID'] = $firmaid;
+
+				$data['EMBG_DATUM'] = $this->date_convert($data['EMBG_DATUM']);
+				$data['LK_DATUM'] = $this->date_convert($data['LK_DATUM']);
+				$data['PASS_DATUM'] = $this->date_convert($data['PASS_DATUM']);
+				$data['VOZACKA_DATUM'] = $this->date_convert($data['VOZACKA_DATUM']);
+				$data['DATUM_POC'] = $this->date_convert($data['DATUM_POC'],true,'-');
+				$data['DATUM_KRAJ'] = $this->date_convert($data['DATUM_KRAJ'], true, '-');
+				$data['PREDV_DATUM_KRAJ'] = $this->date_convert($data['PREDV_DATUM_KRAJ'], true, '-');
+				$data['VOZACKA_DATUM2'] = $this->date_convert($data['VOZACKA_DATUM2']);		
+//				print_r($data);
+//				exit;	
 				try {
 			  		$this->db->query_insert(TABLE_RENT_DOGOVOR, $data);
 				} catch (Exception $e) {
 			    	return  $e->getMessage();
 				}
-				return $result;
+				
+				$this->change_status_rezervacija($firmaid, $dokid, $data['STATUS'], $rdokid);
+
+				//return $result;
 			}
 			else{
 				die('carclas-ERROR-103 Acces Denied');
 			}
 		}
 	}
+	
+	/**
+	 * 
+	 * Од табелата Opstini се зимаат сите општини за одредена фирма
+	 * опптините се места каде може да се остави автомобилот
+	 * @param int $firmaid
+	 */
+	public function get_places($firmaid = null){
+		if(!empty($firmaid)){
+			//proverka dali e logiran korisnikot
+			if($this->login_check()){
+				$this->db_select(); 
+				$this->db->connect();
+				$sql="SELECT * FROM opstini WHERE FIRMAID = '$firmaid'";
+				$result = $this->db->fetch_all_array($sql); 
+				return $result;
+			}
+			else{
+				die('carclas-ERROR-104 Acces Denied');
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * koga rezervacijata pominuva vo naem osven sto se zapisuva vo tabelata rent_dogovor se pravi update i
+	 * na tabelata rent_rezervacii kade statusot se promenuva od R vo N i se pravi vrska so tabelata rent_dogovor
+	 * preku kolonata dog_dok_id koja se nauogja vo rent_rezervacii
+	 * @param int $firmaid //id na firmata koja e logirna
+	 * @param int $dokid //broj na noviot dogovor
+	 * @param char $status //statusot na rezervacija, N
+	 * @param varchar $dokidr //broj na rezervacija
+	 */
+	public function change_status_rezervacija($firmaid = null, $dokid = null, $status=null, $dokidr){
+		if(!empty($dokid)){
+			//proverka dali e logiran korisnikot
+			if($this->login_check()){
+				$this->db_select(); 
+				$this->db->connect();
+				$data['STATUS'] = $status;
+				$data['DOG_DOK_ID'] = $dokid;
+				try {
+					$this->db->query_update(TABLE_RENT_REZERVACII,$data,"DOK_ID='$dokidr' AND FIRMAID='$firmaid'"); 
+				}
+				catch (Exception $e) {
+			    	return  $e->getMessage();
+				}
+				//return $result;
+			}
+			else{
+				die('carclas-ERROR-105 Acces Denied');
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * generiranje na data na ragjanje od vnesen maticen broj
+	 */
+	public function get_birthday_embg($embg =null){
+		if(!empty($embg)){
+			require_once 'Validation.class.php';
+			$val = new Validation();
+			$error = $val->embg_validation($embg);
+			if(empty($error)){
+				$d = substr($embg, 0, 2);
+				$m = substr($embg, 2, 2);
+				$y = substr($embg, 4,3);
+				if(intval(substr($y, 0, 1)) != 9){
+					$y = '2'.$y;
+				}
+				else {
+					$y = '1'.$y;
+				}
+				return "$d/$m/$y";
+			}
+			else{
+				return '';
+			}
+		}
+		else{
+			return '';
+		}
+	}
+	
+	public function get_gorivo_rezervar($firmaid =null){
+		//proverka dali e logiran korisnikot
+		if($this->login_check()){
+			$this->db_select(); 
+			$this->db->connect();
+			$sql="SELECT * FROM cg_ref_codes 
+						WHERE RV_DOMAIN = 'RENT_GORIVO_NIVO' AND firmaid = '$firmaid'";
+			$result = $this->db->fetch_all_array($sql); 
+			return $result;
+		}
+		else{
+			die('carclas-ERROR-108 Acces Denied');
+		}
+		
+	}
+
 }
 ?>

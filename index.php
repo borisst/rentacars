@@ -189,7 +189,7 @@ require("CarReservation.class.php");
 							<input type="text"  name="mesto_kraj" id="mesto_kraj" readonly="readonly"/>
 						</p>				
 					</div>
-					<div id="vkupno-denovi" class="msg"></div><div><input id="vkupno-denovi-input" type="hidden"></input></div>
+					<div id="vkupno-denovi" class="msg"></div><div><input id="vkupno-denovi-input" type="hidden" name="vkupno-denovi-input"></input></div>
 					<div class="grid-12-12">
 						<input id="button-show-second" type="button" onclick="showSecond()" value="Следно" disabled="disabled"/>
 					</div>

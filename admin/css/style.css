@@ -404,3 +404,93 @@ p.datum-izdavanje{
     background-color: #FFCCBA;
     background-image: url('validation.png');
 }
+
+/*css za popupbox za izbiranje na mesto pocetok i mesto kraj */
+#popupBox
+{
+	display: none;
+	width: 20%;
+	height: 300px;
+	overflow: auto;
+	left: 400px;
+	top: 5%;
+	position: absolute;
+	z-index: 2000;
+	border: 2px dashed #000000;
+	background: #f9f9f9;
+	padding-bottom: 20px
+}
+#popupBox_dokumenti
+{
+	display: none;
+	width: 20%;
+	height: 300px;
+	overflow: auto;
+	left: 400px;
+	top: 5%;
+	position: absolute;
+	z-index: 2000;
+	border: 2px dashed #000000;
+	background: #f9f9f9;
+	padding-bottom: 20px
+}
+#overlay
+{
+	display: none;
+	width: 10px;
+	height: 10px;
+	left: 615px;
+	top: 38px;
+	position: absolute;
+	z-index: 1000;
+	background: #333;
+	cursor: pointer;
+}
+#overlay_dokumenti
+{
+	display: none;
+	width: 10px;
+	height: 10px;
+	left: 615px;
+	top: 38px;
+	position: absolute;
+	z-index: 1000;
+	background: #333;
+	cursor: pointer;
+}
+
+
+ul.lokacija {
+  list-style-type: none;
+  width: 200px;
+
+}
+ 
+ul.lokacija h2 {
+  font: bold 20px/1.5 Helvetica, Verdana, sans-serif;
+	margin-left: 10px;
+	size: 100px;
+}
+ 
+ul.lokacija li img {
+  float: left;
+  margin: 0 15px 0 0;
+}
+ 
+ul.lokacija li p {
+  font: 200 12px/1.5 Georgia, Times New Roman, serif;
+}
+ 
+ul.lokacija li {
+  padding: 0px;
+  overflow: auto;
+}
+ 
+ul.lokacija li:hover {
+  background: #eee;
+  cursor: pointer;
+}
+
+/*kraj za popupbox za izbiranje na mesto pocetok i mesto kraj*/
+
+
