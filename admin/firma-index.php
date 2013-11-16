@@ -23,7 +23,11 @@
 	<link rel="stylesheet" href="css/style.css" type="text/css" />
 	<link rel="stylesheet" href="css/formee-style.css" type="text/css" />
 	<link rel="stylesheet" href="css/formee-structure.css" type="text/css" />
-	
+
+	<style title="currentStyle" type="text/css">
+			@import "css/demo_page.css";
+			@import "css/demo_table.css";
+	</style>
 	<script src="../js/jquery.js"></script>
 	<script src="../js/jquery-ui.js"></script>
 	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
@@ -33,7 +37,7 @@
 		<script src="js/knockout-2.2.1.js"></script>
 		<script src="js/globalize.min.js"></script>
 		<script src="js/dx.chartjs.js"></script>
-
+<script src="js/jquery.dataTables.js"></script>
 	<!--- Javascript libraries (jQuery and Selectivizr) used for the custom checkbox --->
 
 	<!--[if (gte IE 6)&(lte IE 8)]>
@@ -45,15 +49,51 @@
 	</head>
 
 	<body>
+	<?php $number_rezervation = $cr->number_reservation_car_class($_SESSION['SESS_FIRMAID']);?>
 	<script type="text/javascript">
-			$(function ()  
-				{
+$(function (){
+	  $("#chartContainer01").dxRangeSelector({
+		    margin: {
+		        top: 50
+		    },
+		    size: {
+		        height: 200
+		    },
+		    scale: {
+		        startValue: new Date(2013, 1, 1),
+		        endValue: new Date(),
+		        minorTickInterval: "week",
+		        majorTickInterval: { days: 7 },
+		        minRange: "week",
+		        maxRange: "week",
+		        showMinorTicks: false
+		    },
+		    sliderMarker: {
+		        format: "dd dddd"
+		    },
+		    selectedRange: {
+		        startValue: new Date(),
+		        endValue: new Date()
+		    },
+		    selectedRangeChanged: function (e) {
+			    console.log(e);
+			    $.ajax({
+					   type: "GET",
+					   url: "action-admin.php",
+					   data: { action:'chartPie', start:e.startValue, end:e.endValue}
+					   }).done(function( msg ) {
+					   $('#popupBox').html(msg);
+					});
+		    }
+		    
+		});
+		
    $("#chartContainer").dxChart({
     dataSource: [
         {day: "Monday", oranges: 3},
         {day: "Tuesday", oranges: 2},
         {day: "Wednesday", oranges: 3},
-        {day: "Thursday", oranges: 4},
+        {day: "Thursday", oranges: 30},
         {day: "Friday", oranges: 6},
         {day: "Saturday", oranges: 11},
         {day: "Sunday", oranges: 4} ],
@@ -64,45 +104,58 @@
         name: "My oranges",
         type: "bar",
         color: '#ffa500'
+    },
+
+    pointClick: function(e) {
+        var clickedArgument = e.orogonalArgument;
+        console.log(e);
+        var newDataSource;
+        //Fill out newDataSource based on clickedArgument 
+        $("#chartContainer").dxChart({
+             dataSource: newDataSource,
+             series: {
+                 argumentField: "newArgField",
+                 valueField: "newValFied",
+                 type: "bar"
+             }
+        });
     }
 });
 
-var dataSource = [
-{ country: "Ford", area: 12 },
-{ country: "Opel", area: 7 },
-{ country: "WV", area: 7 },
-{ country: "Toyota", area: 7 },
-{ country: "Citroen", area: 6 },
-{ country: "Audi", area: 5 },
-{ country: "Peugeot", area: 2 },
+   var dataSource = [
+                  	<?php foreach ($number_rezervation as $nr):?>                  
+                  	{ klasa: "<?php echo $nr['OPIS'];?>", area: <?php echo $nr['br_rezervacii'];?> },
+                  	<?php endforeach;?>
+                  	];
+                  	
+                  	$("#chartContainerP").dxPieChart({
+                  	size:{ 
+                  	  width: 500
+                  	},
+                  	dataSource: dataSource,
+                  	series: [
+                  	  {
+                  	      argumentField: "klasa",
+                  	      valueField: "area",
+                  	      label:{
+                  	          visible: true,
+                  	          connector:{
+                  	              visible:true,           
+                  	              width: 1
+                  	          }
+                  	      }
+                  	  }
+                  	],
+                  	title: "Резервации"
+                  	});
+	
 
-];
-
-$("#chartContainerP").dxPieChart({
-size:{ 
-  width: 500
-},
-dataSource: dataSource,
-series: [
-  {
-      argumentField: "country",
-      valueField: "area",
-      label:{
-          visible: true,
-          connector:{
-              visible:true,           
-              width: 1
-          }
-      }
-  }
-],
-title: "Резервации"
-});
 }
 
 			);
 		</script>
 		<div id="main">
+		<br />
 		<h1>Резервација / Договор за наем на возило</h1>
 			<div id='cssmenu'>
 				<ul>
@@ -115,6 +168,9 @@ title: "Резервации"
 			</div>
 			<div id="content">
 				<div id="loader"></div>
+				<div class="grid-12-12">
+					<div id="chartContainer01" style="width: 100%; height: 240px;"></div>
+					</div>
 				<div class="grid-6-12">
 					<div id="chartContainer" style="width: 100%; height: 240px;"></div>
 					</div>
@@ -138,13 +194,41 @@ title: "Резервации"
 		//  load() functions  
 		    var loadUrl = "action-admin.php?action=contracts_list"; 
 		    var loadUrlRezList = "action-admin.php?action=rezervation_pending_list";  
-		     
+		    var loadUrlNewContract = "action-admin.php?action=new_contract";
 		    $("#contract_list").click(function(){  
-		        $("#content").html(ajax_load).load(loadUrl);  
+		        $("#content").html(ajax_load).load(loadUrl, function() {
+		        	 $('#dogovori').dataTable( {
+		        	        "bPaginate": true,
+		        	        "bLengthChange": true,
+		        	        "bFilter": true,
+		        	        "bSort": true,
+		        	        "bInfo": true,
+		        	        "bAutoWidth": true
+		        	    } );  
+		        }); 
+		    });  
+		    $("#new_contract").click(function(){  
+		        $("#content").html(ajax_load).load(loadUrlNewContract, function() { 
+		        	return false; 
+			        
+		        	//event.preventDefault();
+		        }); 
 		    });  
 		    $("#rezervation_pending_list").click(function(){  
-		        $("#content").html(ajax_load).load(loadUrlRezList);  
+		        $("#content").html(ajax_load).load(loadUrlRezList, function() {
+		        	 $('#rezervacii').dataTable( {
+		        	        "bPaginate": true,
+		        	        "bLengthChange": true,
+		        	        "bFilter": true,
+		        	        "bSort": true,
+		        	        "bInfo": true,
+		        	        "bAutoWidth": true
+		        	    } );
+		        });  
+		       
 		    }); 
+
+
 		    $(document).on("click", "#get_rezervation_detail",function(event){			   
 		    	event.preventDefault();
 	    	    var url = ($(this).attr('href'));
@@ -152,6 +236,7 @@ title: "Резервации"
 	    	    alert(dok_id);
 		    	var loadUrlGetRezDet= "action-admin.php?action=get_rezervation_detail&dok_id="+dok_id; 
 		    	$("#content").html(ajax_load).load(loadUrlGetRezDet);
+		    	
 		    	return false;
 		    });
 
@@ -168,7 +253,7 @@ title: "Резервации"
 		    function getURLParameter(url, name) {
 		        return (RegExp(name + '=' + '(.+?)(&|$)').exec(url)||[,null])[1];
 		    }
-
+		    
 		});
 </script>		
 	</body>

@@ -696,7 +696,7 @@ $(function() {
 		var popust = cena*popust_procenti/100;
 		var vkupno_cenovnik = cena-popust;
 		var ddv_cenovnik = parseInt($('#ddv-cenovnik').val());
-		var ddv_iznos_cenovnik = ddv_cenovnik*cena/100;
+		var ddv_iznos_cenovnik = ddv_cenovnik*vkupno_cenovnik/100;
 		var vkupno = vkupno_cenovnik+ddv_iznos_cenovnik;
 		$("#vkupno-cenovnik").val(vkupno_cenovnik);	
 		$("#vkupno-iznos-cenovnik").val(vkupno);

@@ -31,9 +31,11 @@
 		     case 'get_contract_detail':
 		        get_contract_detail($_SESSION['SESS_FIRMAID'], $_GET['dok_id'], $cr);
 		        break;
-		     case 'birthday':
-		        
+		     case 'birthday':		        
 		     	get_birthday_embg($_GET['birthday_embg'], $cr);
+		        break;
+		     case 'new_contract':	        
+		     	new_contract($_SESSION['SESS_FIRMAID'],$cr);
 		        break;
 		        
 		}
@@ -124,31 +126,58 @@
 		$rezervation_pending_list = $cr->rezervation_pending($firmaid);
 				$html = "
 		
-		<div class=\"table_contracts\" >
+		<div class=\"table_contrdacts dataTables_wrapper\" >
 				<h2>Список на резервации кои чекаат да бидат одобрени</h2>
-                <table >
-                    <tr>
-                        <td>
-                            DOK_ID
-                        </td>
-                        <td >
-                            Контакт
-                        </td>
-                        <td>
-                            Тел
-                        </td>
-                        <td>
-                            Датум од
-                        </td>
-                        <td>
-                            Датум до
-                        </td>
-                        <td>
-                            Опции
-                        </td>
-                    </tr>";
+                <table id='rezervacii' class='display dataTable'>
+                	<thead>
+	                    <tr>
+	                        <th>
+	                            DOK_ID
+	                        </th>
+	                        <th>
+	                            Контакт
+	                        </th>
+	                        <th>
+	                            Тел
+	                        </th>
+	                        <th>
+	                            Датум од
+	                        </th>
+	                        <th>
+	                            Датум до
+	                        </th>
+	                        <th>
+	                            Опции
+	                        </th>
+	                    </tr>
+                    </thead>
+                    <tfoot>
+	                    <tr>
+	                       <th>
+	                            DOK_ID
+	                        </th>
+	                        <th>
+	                            Контакт
+	                        </th>
+	                        <th>
+	                            Тел
+	                        </th>
+	                        <th>
+	                            Датум од
+	                        </th>
+	                        <th>
+	                            Датум до
+	                        </th>
+	                        <th>
+	                            Опции
+	                        </th>
+	                    </tr>
+                    </tfoot>
+                    <tbody>
+                    ";
 		foreach ($rezervation_pending_list as $rpl){
-			$html .= "<tr>
+			$html .= "
+						<tr>
                         <td>
                             <a href='?dok_id=".$rpl['DOK_ID']."' id='get_rezervation_detail'>".$rpl['DOK_ID']."</a>
                         </td>
@@ -167,9 +196,10 @@
                         <td>
                             Опции
                         </td>
-                    </tr>";
+                    </tr>
+                    ";
 		}
-		$html .= "</table></div>
+		$html .= "</tbody></table></div>
 		";
 		echo $html;
 	}
@@ -184,29 +214,54 @@
 		$contract_list = $cr->contracts_list($firmaid);
 		$html = "
 		
-		<div class=\"table_contracts\" >
+		<div class=\"table_contraccts\" >
 				<h2>Список на направени договори</h2>
-                <table >
-                    <tr>
-                        <td>
-                            DOK_ID
-                        </td>
-                        <td >
-                            Контакт
-                        </td>
-                        <td>
-                            Платено
-                        </td>
-                        <td>
-                            Тел
-                        </td>
-                        <td>
-                            Долгорочен
-                        </td>
-                        <td>
-                            Опции
-                        </td>
-                    </tr>";
+                <table id='dogovori' class='display dataTable'>
+                	<thead>
+	                    <tr>
+	                        <th>
+	                            DOK_ID
+	                        </th>
+	                        <th>
+	                            Контакт
+	                        </th>
+	                        <th>
+	                            Платено
+	                        </th>
+	                        <th>
+	                            Тел
+	                        </th>
+	                        <th>
+	                            Долгорочен
+	                        </th>
+	                        <th>
+	                            Опции
+	                        </th>
+	                    </tr>
+                    </thead>
+                    <tfoot>
+	                    <tr>
+	                        <th>
+	                            DOK_ID
+	                        </th>
+	                        <th >
+	                            Контакт
+	                        </th>
+	                        <th>
+	                            Платено
+	                        </th>
+	                        <th>
+	                            Тел
+	                        </th>
+	                        <th>
+	                            Долгорочен
+	                        </th>
+	                        <th>
+	                            Опции
+	                        </th>
+	                    </tr>
+                    </tfoot>
+                    <tbody>";
 		foreach ($contract_list as $cl){
 			$html .= "<tr>
                         <td>
@@ -229,7 +284,7 @@
                         </td>
                     </tr>";
 		}
-		$html .= "</table></div>";
+		$html .= "</tbody></table></div>";
 		echo $html;
 	}
 	
@@ -260,6 +315,9 @@
 		echo $birthday;
 	}
 
+	function new_contract($firmaid, $cr){
+		include("firma-nov-dogovor-forma.php");
+	}
 ?>
 
             
